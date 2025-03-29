@@ -5,7 +5,7 @@ export type Activity = {
   description: string
   features: string[]
   duration: string
-  difficulty: "Fácil" | "Moderado" | "Difícil" | "Extremo"
+  difficulty: "Fácil" | "Moderado" | "Difícil" | "Extremo" | "Fácil a Difícil (según ruta)" | "Moderado a Difícil"
   price: string
   location: string
   included: string[]
@@ -17,7 +17,7 @@ export const activities: Activity[] = [
   {
     id: "camping",
     name: "CAMPING",
-    image: "/placeholder.svg?height=200&width=200",
+    image: "/camping-actividad.webp",
     description:
       "Disfruta de una experiencia única en la naturaleza con nuestro servicio de camping premium. Desconecta de la rutina y conecta con el entorno natural en ubicaciones cuidadosamente seleccionadas por su belleza y seguridad.",
     features: [
@@ -47,7 +47,7 @@ export const activities: Activity[] = [
   {
     id: "escalada",
     name: "ESCALADA",
-    image: "/placeholder.svg?height=200&width=200",
+    image: "/escalada-actividad.webp",
     description:
       "Desafía tus límites con nuestras experiencias de escalada diseñadas para todos los niveles. Desde principiantes hasta escaladores experimentados, ofrecemos rutas espectaculares con vistas incomparables y la máxima seguridad.",
     features: [
@@ -57,7 +57,7 @@ export const activities: Activity[] = [
       "Técnicas de seguridad avanzadas",
     ],
     duration: "Medio día a día completo",
-    difficulty: "Fácil a Extremo (según ruta)",
+    difficulty: "Fácil",
     price: "Desde €80 por persona",
     location: "Formaciones rocosas naturales y paredes artificiales",
     included: [
@@ -77,7 +77,7 @@ export const activities: Activity[] = [
   {
     id: "senderismo",
     name: "SENDERISMO",
-    image: "/placeholder.svg?height=200&width=200",
+    image: "/senderistas-actividad.webp",
     description:
       "Explora paisajes impresionantes a través de nuestras rutas de senderismo cuidadosamente seleccionadas. Camina entre bosques, montañas y valles mientras descubres la flora y fauna local con guías expertos en naturaleza.",
     features: [
@@ -107,7 +107,7 @@ export const activities: Activity[] = [
   {
     id: "parapente",
     name: "PARAPENTE",
-    image: "/placeholder.svg?height=200&width=200",
+    image: "/parapente-actividad.webp",
     description:
       "Experimenta la libertad absoluta volando como un pájaro con nuestras experiencias de parapente. Siente la adrenalina mientras disfrutas de vistas aéreas espectaculares de paisajes que solo pueden apreciarse desde el cielo.",
     features: [
@@ -132,7 +132,7 @@ export const activities: Activity[] = [
   {
     id: "rafting",
     name: "RAFTING",
-    image: "/placeholder.svg?height=200&width=200",
+    image: "/rafting-actividad.webp",
     description:
       "Vive la emoción de descender por rápidos de aguas bravas en nuestras experiencias de rafting. Trabaja en equipo para navegar por ríos caudalosos mientras disfrutas de la belleza natural de los cañones y valles fluviales.",
     features: [
@@ -161,8 +161,8 @@ export const activities: Activity[] = [
   },
   {
     id: "esqui",
-    name: "ESQUÍ",
-    image: "/placeholder.svg?height=200&width=200",
+    name: "BICI MONTAÑA",
+    image: "/bici-montaña.webp",
     description:
       "Deslízate por las mejores pistas de esquí con nuestros paquetes diseñados para todos los niveles. Disfruta de la nieve perfecta, paisajes alpinos impresionantes y el mejor servicio para que tu experiencia de esquí sea inolvidable.",
     features: [
@@ -172,7 +172,7 @@ export const activities: Activity[] = [
       "Equipo de alta calidad",
     ],
     duration: "Medio día a semana completa",
-    difficulty: "Fácil a Extremo (según pistas)",
+    difficulty: "Extremo",
     price: "Desde €90 por día",
     location: "Estaciones de esquí premium en montañas seleccionadas",
     included: ["Forfait para remontes", "Alquiler de equipo básico", "Seguro de pistas", "Almacenamiento de equipo"],

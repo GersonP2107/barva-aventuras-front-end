@@ -1,13 +1,30 @@
 import type React from "react"
-import "./globals.css"
+import type { Metadata } from "next"
 import { Inter } from "next/font/google"
+import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
 
 const inter = Inter({ subsets: ["latin"] })
 
-export const metadata = {
-  title: "Barva Aventuras - Turismo Ecológico y Experiencias únicas en Costa Rica.",
-  description: "Descubre la belleza natural de Costa Rica con Barva Aventuras, una agencia especializada en turismo ecológico y cultural. Vive experiencias inolvidables junto a tu familia o amigos explorando rutas como El Camino de Costa Rica, caminatas al majestuoso Cerro Chirripó y excursiones llenas de naturaleza, tradición y aventura.",
+export const metadata: Metadata = {
+  title: "Barva Aventuras",
+  description: "Descubre aventuras inolvidables en Costa Rica",
+  icons: {
+    icon: [
+      {
+        url: "/logo.png",
+        type: "image/png",
+      },
+      {
+        url: "/favicon.ico",
+        sizes: "any",
+      },
+    ],
+    apple: {
+      url: "/logo.png",
+      type: "image/png",
+    },
+  },
 }
 
 export default function RootLayout({
@@ -16,7 +33,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
+    <html lang="es">
       <body className={inter.className}>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
           {children}

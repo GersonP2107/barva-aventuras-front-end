@@ -17,7 +17,7 @@ export default function WhatsappButton() {
   }, [])
 
   // Número de WhatsApp (reemplazar con el número real)
-  const phoneNumber = "34600000000"
+  const phoneNumber = "+506 8342 8167"
   const message = "Hola, estoy interesado en sus servicios de aventura."
 
   // URL de WhatsApp con el número y mensaje predefinido

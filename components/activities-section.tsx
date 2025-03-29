@@ -2,7 +2,6 @@
 
 import { useState } from "react"
 import Image from "next/image"
-import { Button } from "@/components/ui/button"
 import { type Activity, getAllActivities } from "@/lib/activities-data"
 import ActivityModal from "@/components/activity-modal"
 import SimpleCarousel from "@/components/simple-carousel"
@@ -35,7 +34,7 @@ export default function ActivitiesSection() {
     <section id="actividades" className="container mx-auto px-4 py-16">
       <div className="mb-6">
         <h3 className="text-amber-500 font-medium mb-2 animate-fade-in">ACTIVIDADES DE TOUR</h3>
-        <h2 className="text-4xl md:text-5xl font-bold italic mb-4">Lo Mejor en Actividades</h2>
+        <h2 className="text-4xl md:text-5xl font-bold mb-4">Lo Mejor en Actividades</h2>
         <p className="text-zinc-400 max-w-3xl mb-10">
           Descubre nuestras emocionantes actividades diseñadas para todos los niveles de aventureros. Desde tranquilos
           paseos por la naturaleza hasta adrenalínicas experiencias extremas, tenemos algo para cada viajero.
@@ -63,20 +62,9 @@ export default function ActivitiesSection() {
                 <span className="bg-amber-500 text-black px-3 py-1 rounded-full text-sm font-medium">Ver Detalles</span>
               </div>
             </button>
-            <p className="text-zinc-400 text-sm mt-3 text-center">
-              {activity.difficulty} • {activity.duration}
-            </p>
           </div>
         ))}
       </SimpleCarousel>
-
-      <div className="flex flex-col items-center">
-        <Button className="bg-amber-500 hover:bg-amber-600 text-black mb-4 rounded-full px-8 py-3 transition-all duration-300 transform hover:scale-105">
-          VER TODAS LAS ACTIVIDADES
-        </Button>
-        <span className="text-amber-500 font-medium">NUESTROS PAQUETES</span>
-      </div>
-
       <ActivityModal activity={selectedActivity} isOpen={isModalOpen} onClose={closeModal} />
     </section>
   )

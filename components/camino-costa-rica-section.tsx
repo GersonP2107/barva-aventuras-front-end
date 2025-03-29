@@ -18,7 +18,7 @@ export default function CaminoCostaRicaSection() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-center mb-12">
-          <div className="relative h-[560px] w-[70%] mx-auto rounded-lg overflow-hidden">
+          <div className="relative w-[90%] h-[480px] md:h-[560px] md:w-[70%] mx-auto rounded-lg overflow-hidden">
             <Image
               src="/playa-costa-rica.webp"
               alt="Camino de Costa Rica"

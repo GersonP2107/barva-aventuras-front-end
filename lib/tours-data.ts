@@ -23,7 +23,7 @@ export const tours: Tour[] = [
   {
     id: "senderismo",
     title: "Tour de Senderismo",
-    image: "/placeholder.svg?height=300&width=400",
+    image: "/senderismo.webp",
     locations: 4,
     description:
       "Explora los senderos más impresionantes a través de bosques, montañas y valles. Este tour de senderismo te llevará a través de paisajes espectaculares mientras disfrutas de la naturaleza en su estado más puro.",
@@ -87,7 +87,7 @@ export const tours: Tour[] = [
   {
     id: "rafting",
     title: "Rafting en Aguas Bravas",
-    image: "/placeholder.svg?height=300&width=400",
+    image: "/rafting.webp",
     locations: 8,
     description:
       "Siente la adrenalina mientras navegas por rápidos emocionantes en algunos de los ríos más impresionantes. Este tour de rafting combina emoción, trabajo en equipo y paisajes espectaculares.",
@@ -141,69 +141,9 @@ export const tours: Tour[] = [
     ],
   },
   {
-    id: "kayak",
-    title: "Kayak en Río",
-    image: "/placeholder.svg?height=300&width=400",
-    locations: 6,
-    description:
-      "Explora ríos serenos y rápidos emocionantes en tu propio kayak. Este tour te permite conectar con el agua de una manera única mientras mejoras tus habilidades de navegación.",
-    features: [
-      "Kayaks individuales de alta calidad",
-      "Rutas adaptadas a diferentes niveles",
-      "Instrucción personalizada",
-      "Exploración de zonas solo accesibles por agua",
-    ],
-    duration: "4 días / 3 noches",
-    difficulty: "Moderado",
-    price: "Desde €550 por persona",
-    destination: "Ríos y Lagos Seleccionados",
-    included: [
-      "Alojamiento en cabañas junto al agua",
-      "Desayunos y almuerzos",
-      "Equipo completo de kayak",
-      "Clases de técnica y seguridad",
-      "Guías especializados",
-    ],
-    notIncluded: [
-      "Cenas (excepto la de bienvenida)",
-      "Transporte hasta el punto de inicio",
-      "Equipo personal",
-      "Seguro de viaje",
-    ],
-    itinerary: [
-      {
-        day: 1,
-        title: "Fundamentos del Kayak",
-        description: "Introducción al equipo, técnicas básicas y prácticas de seguridad en aguas tranquilas.",
-      },
-      {
-        day: 2,
-        title: "Navegación en Lago",
-        description: "Recorrido por un lago pintoresco, practicando maniobras y técnicas de remo eficiente.",
-      },
-      {
-        day: 3,
-        title: "Río de Clase I-II",
-        description:
-          "Primera experiencia en aguas en movimiento, aprendiendo a leer el río y navegar rápidos sencillos.",
-      },
-      {
-        day: 4,
-        title: "Aventura Final",
-        description: "Descenso por un tramo más desafiante, aplicando todas las habilidades aprendidas.",
-      },
-    ],
-    recommendations: [
-      "Habilidad básica de natación",
-      "Ropa que pueda mojarse y seque rápido",
-      "Protección solar y gorra",
-      "Actitud positiva y disposición para aprender",
-    ],
-  },
-  {
     id: "escalada",
     title: "Escalada en Montaña",
-    image: "/placeholder.svg?height=300&width=400",
+    image: "/escala.webp",
     locations: 5,
     description:
       "Desafía tus límites escalando algunas de las formaciones rocosas más impresionantes. Este tour combina adrenalina, superación personal y vistas panorámicas incomparables.",

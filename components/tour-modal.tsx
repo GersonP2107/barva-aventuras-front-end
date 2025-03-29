@@ -169,7 +169,20 @@ export default function TourModal({ tour, isOpen, onClose }: TourModalProps) {
           </div>
 
           <div className="flex justify-center mt-8">
-            <Button className="bg-amber-500 hover:bg-amber-600 text-black rounded-full px-8 py-6 text-lg font-semibold transition-all duration-300 transform hover:scale-105">
+            <Button 
+              className="bg-amber-500 hover:bg-amber-600 text-black rounded-full px-8 py-6 text-lg font-semibold transition-all duration-300 transform hover:scale-105"
+              onClick={() => {
+                // Close the modal first
+                onClose();
+                // Use setTimeout to delay the scroll action slightly
+                setTimeout(() => {
+                  const cotizarSection = document.getElementById('cotizar');
+                  if (cotizarSection) {
+                    cotizarSection.scrollIntoView({ behavior: 'smooth' });
+                  }
+                }, 100);
+              }}
+            >
               Reservar Este Tour
             </Button>
           </div>

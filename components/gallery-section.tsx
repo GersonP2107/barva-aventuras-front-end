@@ -6,42 +6,47 @@ import { X } from "lucide-react"
 
 const galleryImages = [
   {
-    src: "/placeholder.svg?height=400&width=600",
+    src: "/playa.webp",
     alt: "Playa en Costa Rica",
     category: "Playas",
   },
   {
-    src: "/placeholder.svg?height=400&width=600",
+    src: "/vista-mar.webp",
+    alt: "Playa en Costa Rica",
+    category: "Playas",
+  },
+  {
+    src: "/palmeras-playa.webp",
+    alt: "Playa en Costa Rica",
+    category: "Playas",
+  },
+  {
+    src: "/mar.webp",
+    alt: "Playa en Costa Rica",
+    category: "Playas",
+  },
+  {
+    src: "/volcan.webp",
     alt: "Volcán Arenal",
     category: "Volcanes",
   },
   {
-    src: "/placeholder.svg?height=400&width=600",
-    alt: "Selva tropical",
-    category: "Selvas",
-  },
-  {
-    src: "/placeholder.svg?height=400&width=600",
-    alt: "Fauna de Costa Rica",
-    category: "Fauna",
-  },
-  {
-    src: "/placeholder.svg?height=400&width=600",
-    alt: "Cascada en la selva",
-    category: "Cascadas",
-  },
-  {
-    src: "/placeholder.svg?height=400&width=600",
+    src: "/atardecer.webp",
     alt: "Atardecer en el Pacífico",
     category: "Atardeceres",
   },
   {
-    src: "/placeholder.svg?height=400&width=600",
-    alt: "Aventura en tirolesa",
-    category: "Aventuras",
+    src: "/capilla.webp",
+    alt: "Cultura local",
+    category: "Cultura",
   },
   {
-    src: "/placeholder.svg?height=400&width=600",
+    src: "/barva-capilla.webp",
+    alt: "Cultura local",
+    category: "Cultura",
+  },
+  {
+    src: "/cementerio.webp",
     alt: "Cultura local",
     category: "Cultura",
   },
