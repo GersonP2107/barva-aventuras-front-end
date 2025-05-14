@@ -1,20 +1,26 @@
+
 "use client"
 
 import { useState, useEffect } from "react"
 import Image from "next/image"
-import { X, Clock, MapPin, DollarSign, AlertTriangle, CheckCircle, XCircle, Info } from "lucide-react"
-import type { Activity } from "@/lib/activities-data"
+import { X, Clock, MapPin, DollarSign } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import type { Activity } from "@/types/activity"; // Assuming type is defined here or adjust path
 
 type ActivityModalProps = {
-  activity: Activity | null
+  // activity: Activity | null // Remove this prop
+  activityId: string | null // Add activityId prop
   isOpen: boolean
   onClose: () => void
 }
 
-export default function ActivityModal({ activity, isOpen, onClose }: ActivityModalProps) {
+export default function ActivityModal({ activityId, isOpen, onClose: handleClose }: ActivityModalProps & { onClose: () => void }) {
   const [mounted, setMounted] = useState(false)
+  // Add state for activity data, loading, and error
+  const [activity, setActivity] = useState<Activity | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     setMounted(true)
@@ -27,6 +33,48 @@ export default function ActivityModal({ activity, isOpen, onClose }: ActivityMod
       document.body.style.overflow = "auto"
     }
   }, [isOpen])
+
+  // Add useEffect for fetching data
+  useEffect(() => {
+    const fetchActivity = async () => {
+      if (!isOpen || !activityId) {
+        // Don't fetch if modal is closed or no ID is provided
+        setActivity(null); // Reset data when closed or ID changes
+        setLoading(false);
+        setError(null);
+        return;
+      }
+
+      setLoading(true);
+      setError(null);
+      setActivity(null); // Clear previous data before fetching new
+
+      try {
+        console.log(`Fetching activity with ID: ${activityId}`); // Log fetching attempt
+        const response = await fetch(`http://localhost:3001/activities/${activityId}`, { cache: 'no-store' });
+        if (!response.ok) {
+          throw new Error(`Failed to fetch activity. Status: ${response.status}`);
+        }
+        const data: Activity = await response.json();
+        console.log("Activity data fetched:", data); // Log fetched data
+        setActivity(data);
+      } catch (err) {
+        console.error("Error fetching activity:", err);
+        setError(err instanceof Error ? err.message : "An unknown error occurred");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (mounted) {
+       fetchActivity();
+    }
+
+    // Cleanup function or dependency array logic might be needed
+    // depending on how often activityId/isOpen change while mounted.
+    // This setup fetches when isOpen becomes true with a valid activityId.
+
+  }, [isOpen, activityId, mounted]); // Add dependencies
 
   if (!mounted) return null
   if (!activity) return null
@@ -55,20 +103,23 @@ export default function ActivityModal({ activity, isOpen, onClose }: ActivityMod
         onClick={(e) => e.stopPropagation()}
       >
         <div className="relative h-64 md:h-80">
-          <Image
-            src={activity.image || "/placeholder.svg"}
+        <Image
+            src={activity.image?.startsWith("/uploads")
+              ? `http://localhost:3001${activity.image}`
+              : activity.image || "/placeholder.svg"}
             alt={activity.name}
             fill
             className="object-cover rounded-t-xl"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-zinc-900 to-transparent"></div>
           <button
-            onClick={onClose}
+            onClick={handleClose}
             className="absolute top-4 right-4 bg-zinc-900/80 text-white p-2 rounded-full hover:bg-zinc-800 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
           <div className="absolute bottom-4 left-4">
+             {/* Use activityData */}
             <Badge className={`${getDifficultyColor(activity.difficulty)} text-white px-3 py-1 text-xs`}>
               {activity.difficulty}
             </Badge>
@@ -76,100 +127,40 @@ export default function ActivityModal({ activity, isOpen, onClose }: ActivityMod
         </div>
 
         <div className="p-6">
-          <h2 className="text-3xl font-bold text-amber-500 mb-2">{activity.name}</h2>
-
+           {/* Use activityData */}
+          <h2 className="text-4xl font-bold text-amber-500 mb-5">{activity.name}</h2>
+           {/* Use activityData */}
+          <p className="text-zinc-300 text-2xl mb-5">{activity.description}</p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            <div className="flex items-center text-zinc-300">
+            <div className="flex items-center text-xl text-zinc-300">
               <Clock className="w-5 h-5 text-amber-500 mr-2" />
+               {/* Use activityData */}
               <span>{activity.duration}</span>
             </div>
-            <div className="flex items-center text-zinc-300">
-              <MapPin className="w-5 h-5 text-amber-500 mr-2" />
+            <div className="flex items-center text-xl text-zinc-300">
+              <MapPin className="w-10 h-10 text-amber-500 " />
+               {/* Use activityData */}
               <span>{activity.location}</span>
             </div>
-            <div className="flex items-center text-zinc-300">
+            <div className="flex items-center text-xl text-zinc-300">
               <DollarSign className="w-5 h-5 text-amber-500 mr-2" />
-              <span>{activity.price}</span>
+              {/* Format price with thousands separator */}
+              <span>{activity.price?.toLocaleString('es-CR')} CRC</span>
             </div>
           </div>
-
-          <p className="text-zinc-300 mb-6">{activity.description}</p>
-
-          <div className="mb-6">
-            <h3 className="text-xl font-semibold mb-3 flex items-center">
-              <Info className="w-5 h-5 text-amber-500 mr-2" />
-              Características
-            </h3>
-            <ul className="grid grid-cols-1 md:grid-cols-2 gap-2">
-              {activity.features.map((feature, index) => (
-                <li key={index} className="flex items-start">
-                  <span className="text-amber-500 mr-2">•</span>
-                  <span className="text-zinc-300">{feature}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-            <div>
-              <h3 className="text-xl font-semibold mb-3 flex items-center">
-                <CheckCircle className="w-5 h-5 text-green-500 mr-2" />
-                Incluido
-              </h3>
-              <ul className="space-y-2">
-                {activity.included.map((item, index) => (
-                  <li key={index} className="flex items-start text-zinc-300">
-                    <span className="text-green-500 mr-2">✓</span>
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <div>
-              <h3 className="text-xl font-semibold mb-3 flex items-center">
-                <XCircle className="w-5 h-5 text-red-500 mr-2" />
-                No Incluido
-              </h3>
-              <ul className="space-y-2">
-                {activity.notIncluded.map((item, index) => (
-                  <li key={index} className="flex items-start text-zinc-300">
-                    <span className="text-red-500 mr-2">✗</span>
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-
-          <div className="mb-6">
-            <h3 className="text-xl font-semibold mb-3 flex items-center">
-              <AlertTriangle className="w-5 h-5 text-amber-500 mr-2" />
-              Recomendaciones
-            </h3>
-            <ul className="space-y-2">
-              {activity.recommendations.map((recommendation, index) => (
-                <li key={index} className="flex items-start text-zinc-300">
-                  <span className="text-amber-500 mr-2">→</span>
-                  <span>{recommendation}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-
           <div className="flex justify-center mt-8">
-            <Button 
+            <Button
               className="bg-amber-500 hover:bg-amber-600 text-black rounded-full px-8 py-6 text-lg font-semibold transition-all duration-300 transform hover:scale-105"
               onClick={() => {
                 // Close the modal first
-                onClose();
+                handleClose();
                 // Use setTimeout to delay the scroll action slightly
                 setTimeout(() => {
                   const cotizarSection = document.getElementById('cotizar');
                   if (cotizarSection) {
                     cotizarSection.scrollIntoView({ behavior: 'smooth' });
                   }
-                }, 100);
+                }, 100); // Delay ensures modal is closed before scrolling
               }}
             >
               Reservar Esta Actividad

@@ -39,11 +39,11 @@ export default function SimpleCarousel({
     <div className={`relative ${className}`}>
       <div className="overflow-hidden">
         <div
-          className="flex transition-transform duration-500 ease-out p-5"
+          className="flex md:justify-around transition-transform duration-500 ease-out p-5"
           style={{ transform: `translateX(-${currentIndex * (100 / itemsPerView)}%)` }}
         >
           {children.map((child, index) => (
-            <div key={index} className="px-2" style={{ width: `${100 / itemsPerView}%`, flexShrink: 0 }}>
+            <div key={index} className="px-2" style={{ width: `${160 / itemsPerView}%`, flexShrink: 0 }}>
               {child}
             </div>
           ))}

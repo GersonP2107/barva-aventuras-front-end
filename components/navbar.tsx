@@ -21,6 +21,15 @@ export default function Navbar() {
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen)
   }
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+  setIsMounted(true);
+  }, []);
+
+  if (!isMounted) {
+    return null; // or a skeleton/placeholder with the same structure
+}
 
   const scrollToSection = (id: string) => {
     const element = document.getElementById(id)

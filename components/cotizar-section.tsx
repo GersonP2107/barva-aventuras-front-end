@@ -1,10 +1,10 @@
 "use client"
 
 import type React from "react"
-
-import { useState } from "react"
+import { useState, useRef } from "react"
 import { Button } from "@/components/ui/button"
-import { Calendar, MapPin, Clock, Send } from "lucide-react"
+import { Calendar, MapPin, Clock, Send, Loader2 } from "lucide-react"
+import emailjs from '@emailjs/browser'
 
 export default function CotizarSection() {
   const [formData, setFormData] = useState({
@@ -17,6 +17,12 @@ export default function CotizarSection() {
     destinos: "",
     mensaje: "",
   })
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [submitStatus, setSubmitStatus] = useState<{
+    success: boolean;
+    message: string;
+  } | null>(null)
+  const formRef = useRef<HTMLFormElement>(null)
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target
@@ -26,21 +32,53 @@ export default function CotizarSection() {
     }))
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // Aquí iría la lógica para enviar el formulario
-    alert("Formulario enviado con éxito. Nos pondremos en contacto contigo pronto.")
-    // Resetear el formulario
-    setFormData({
-      nombre: "",
-      email: "",
-      telefono: "",
-      personas: "",
-      fechaViaje: "",
-      duracion: "",
-      destinos: "",
-      mensaje: "",
-    })
+    setIsSubmitting(true)
+    setSubmitStatus(null)
+    
+    try {
+      // Reemplaza estos valores con tus propias credenciales de EmailJS
+      const serviceId = 'service_8ckrglq'
+      const templateId = 'template_tmxvydm'
+      const publicKey = 'qPLrdTXqg0PZSTWiZ'
+      
+      // Usando sendForm en lugar de send
+      if (formRef.current) {
+        const result = await emailjs.sendForm(
+          serviceId,
+          templateId,
+          formRef.current,
+          publicKey
+        )
+        
+        console.log('Email enviado con éxito:', result.text)
+        setSubmitStatus({
+          success: true,
+          message: "¡Gracias! Tu solicitud ha sido enviada. Nos pondremos en contacto contigo pronto."
+        })
+        
+        // Resetear el formulario
+        setFormData({
+          nombre: "",
+          email: "",
+          telefono: "",
+          personas: "",
+          fechaViaje: "",
+          duracion: "",
+          destinos: "",
+          mensaje: "",
+        })
+      }
+    } catch (error) {
+      console.error('Error al enviar el email:', error)
+      setSubmitStatus({
+        success: false,
+        message: "Lo sentimos, hubo un problema al enviar tu solicitud. Por favor, intenta nuevamente o contáctanos directamente."
+      })
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -57,6 +95,7 @@ export default function CotizarSection() {
 
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
           <div className="lg:col-span-2 space-y-6">
+            {/* Contenido de la columna izquierda sin cambios */}
             <div className="bg-zinc-800/50 p-6 rounded-lg">
               <h3 className="text-xl font-bold mb-4 flex items-center">
                 <span className="w-8 h-8 bg-amber-500 rounded-full flex items-center justify-center mr-3">
@@ -113,38 +152,46 @@ export default function CotizarSection() {
           </div>
 
           <div className="lg:col-span-3">
-            <form onSubmit={handleSubmit} className="bg-zinc-800/50 p-6 rounded-lg">
+            <form ref={formRef} onSubmit={handleSubmit} className="bg-zinc-800/50 p-6 rounded-lg">
+              {/* Mensaje de estado del envío */}
+              {submitStatus && (
+                <div className={`mb-6 p-4 rounded-lg ${submitStatus.success ? 'bg-green-500/20 text-green-200' : 'bg-red-500/20 text-red-200'}`}>
+                  {submitStatus.message}
+                </div>
+              )}
+              
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 <div>
-                  <label htmlFor="nombre" className="block text-sm font-medium text-zinc-300 mb-1">
+                  <label htmlFor="from_name" className="block text-sm font-medium text-zinc-300 mb-1">
                     Nombre completo *
                   </label>
                   <input
                     type="text"
-                    id="nombre"
-                    name="nombre"
+                    id="from_name"
+                    name="from_name"
                     value={formData.nombre}
-                    onChange={handleChange}
+                    onChange={(e) => setFormData({...formData, nombre: e.target.value})}
                     required
                     className="w-full bg-zinc-700 border border-zinc-600 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-amber-500"
                   />
                 </div>
                 <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-zinc-300 mb-1">
+                  <label htmlFor="from_email" className="block text-sm font-medium text-zinc-300 mb-1">
                     Correo electrónico *
                   </label>
                   <input
                     type="email"
-                    id="email"
-                    name="email"
+                    id="from_email"
+                    name="from_email"
                     value={formData.email}
-                    onChange={handleChange}
+                    onChange={(e) => setFormData({...formData, email: e.target.value})}
                     required
                     className="w-full bg-zinc-700 border border-zinc-600 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-amber-500"
                   />
                 </div>
               </div>
 
+              {/* Resto de los campos del formulario con nombres actualizados */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 <div>
                   <label htmlFor="telefono" className="block text-sm font-medium text-zinc-300 mb-1">
@@ -178,16 +225,16 @@ export default function CotizarSection() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 <div>
-                  <label htmlFor="fechaViaje" className="block text-sm font-medium text-zinc-300 mb-1">
+                  <label htmlFor="fecha_viaje" className="block text-sm font-medium text-zinc-300 mb-1">
                     Fecha aproximada de viaje
                   </label>
                   <div className="relative">
                     <input
                       type="date"
-                      id="fechaViaje"
-                      name="fechaViaje"
+                      id="fecha_viaje"
+                      name="fecha_viaje"
                       value={formData.fechaViaje}
-                      onChange={handleChange}
+                      onChange={(e) => setFormData({...formData, fechaViaje: e.target.value})}
                       className="w-full bg-zinc-700 border border-zinc-600 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-amber-500"
                     />
                     <Calendar className="absolute right-3 top-1/2 transform -translate-y-1/2 text-zinc-400 pointer-events-none w-5 h-5" />
@@ -242,11 +289,23 @@ export default function CotizarSection() {
                 ></textarea>
               </div>
 
+              {/* Campo oculto para el destinatario */}
+              <input type="hidden" name="to_name" value="Barva Aventuras" />
+
               <Button
                 type="submit"
-                className="bg-amber-500 hover:bg-amber-600 text-black rounded-full px-8 py-3 transition-all duration-300 transform hover:scale-105 w-full flex items-center justify-center"
+                disabled={isSubmitting}
+                className="bg-amber-500 hover:bg-amber-600 text-black rounded-full px-8 py-3 transition-all duration-300 transform hover:scale-105 w-full flex items-center justify-center disabled:opacity-70"
               >
-                Enviar Solicitud <Send className="ml-2 w-5 h-5" />
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="mr-2 h-5 w-5 animate-spin" /> Enviando...
+                  </>
+                ) : (
+                  <>
+                    Enviar Solicitud <Send className="ml-2 w-5 h-5" />
+                  </>
+                )}
               </Button>
             </form>
           </div>

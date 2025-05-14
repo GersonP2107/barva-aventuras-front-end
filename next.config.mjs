@@ -21,6 +21,14 @@ const nextConfig = {
     parallelServerBuildTraces: true,
     parallelServerCompiles: true,
   },
+  remotePatterns: [
+    {
+      protocol: "http",
+      hostname: "localhost",
+      port: "3001",
+      pathname: "/uploads/**",
+    },
+  ],
 }
 
 mergeConfig(nextConfig, userConfig)
