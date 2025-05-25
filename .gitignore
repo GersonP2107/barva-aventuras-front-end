@@ -1,0 +1,8 @@
+# Crear archivo .gitignore con contenido básico para proyecto Node.js/front-end
+echo "node_modules/" > .gitignore
+echo ".DS_Store" >> .gitignore
+echo "dist/" >> .gitignore
+echo ".env" >> .gitignore
+echo ".env.local" >> .gitignore
+echo ".vscode/" >> .gitignore
+echo "*.log" >> .gitignore
