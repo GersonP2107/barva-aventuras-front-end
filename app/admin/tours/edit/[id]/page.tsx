@@ -227,7 +227,7 @@ export default function EditTour() {
         <Button
           variant="outline"
           onClick={() => router.back()}
-          className="border-zinc-700 text-black hover:bg-zinc-800"
+          className="border-zinc-700 text-black hover:bg-zinc-400"
         >
           <ArrowLeft className="w-4 h-4 mr-2" /> Volver
         </Button>

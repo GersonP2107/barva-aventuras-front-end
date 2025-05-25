@@ -58,7 +58,7 @@ export default function HeroSection() {
                 className="object-cover"
                 priority={index === 0}
               />
-              <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/40 to-black/70"></div>
+              <span className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/40 to-black/70"></span>
             </div>
           ))}
         </div>
@@ -116,28 +116,6 @@ export default function HeroSection() {
           {/* Scroll Indicator */}
           <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
             <ChevronDown className="w-8 h-8 text-amber-400" />
-          </div>
-
-          {/* Stats Bar */}
-          <div className="absolute bottom-0 left-0 right-0 bg-black/30 backdrop-blur-sm">
-            <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-4 py-6 px-4">
-              <div className="text-center">
-                <div className="text-3xl font-bold text-amber-400">15+</div>
-                <div className="text-sm text-gray-300">Años de Experiencia</div>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl font-bold text-amber-400">50+</div>
-                <div className="text-sm text-gray-300">Destinos</div>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl font-bold text-amber-400">1000+</div>
-                <div className="text-sm text-gray-300">Clientes Felices</div>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl font-bold text-amber-400">4.9</div>
-                <div className="text-sm text-gray-300">Calificación Promedio</div>
-              </div>
-            </div>
           </div>
         </div>
       </div>

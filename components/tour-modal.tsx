@@ -121,38 +121,38 @@ export default function TourModal({ tour, isOpen, onClose: handleClose }: TourMo
         {/* Scrollable Content Area */}
         <div className="p-6 overflow-y-auto">
           {/* Title */}
-          <h2 className="text-3xl font-bold text-amber-500 mb-4">{tour.title}</h2>
+          <h2 className="text-4xl font-bold text-amber-500 mb-4">{tour.title}</h2>
 
           {/* Quick Info Row (Duration, Destination, Price) */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6 text-sm">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6 text-xl">
             {tour.duration && (
                 <div className="flex items-center text-zinc-300">
-                  <Clock className="w-4 h-4 text-amber-500 mr-2 flex-shrink-0" />
+                  <Clock className="w-5 h-5 text-amber-500 mr-2 flex-shrink-0" />
                   <span>{tour.duration}</span>
                 </div>
             )}
             {tour.destination && (
                 <div className="flex items-center text-zinc-300">
-                  <MapPin className="w-4 h-4 text-amber-500 mr-2 flex-shrink-0" />
+                  <MapPin className="w-5 h-5 text-amber-500 mr-2 flex-shrink-0" />
                   <span>{tour.destination}</span>
                 </div>
             )}
             {tour.price != null && ( // Check for null/undefined, allow 0
                 <div className="flex items-center text-zinc-300">
-                  <DollarSign className="w-4 h-4 text-amber-500 mr-2 flex-shrink-0" />
-                  {/* Format price if needed */}
-                  <span>₡{tour.price.toLocaleString()}</span>
+                  <DollarSign className="w-5 h-5 text-amber-500 mr-2 flex-shrink-0" />
+                  {/* Format price with decimal places and currency code */}
+                  <span>₡{tour.price.toLocaleString()} CRC</span>
                 </div>
             )}
           </div>
           {/* Description */}
           {tour.description && (
-              <p className="text-zinc-300 mb-6 mt-6 whitespace-pre-line">{tour.description}</p>
+              <p className="text-zinc-300 text-xl mb-6 mt-6 whitespace-pre-line">{tour.description}</p>
           )}
           {/* Features (Optional - if you have this field) */}
           {tour.features && tour.features.length > 0 && (
             <div className="mb-6">
-              <h3 className="text-xl font-semibold mb-3 flex items-center text-zinc-100">
+              <h3 className="text-lg font-semibold mb-3 flex items-center text-zinc-100">
                 <Info className="w-5 h-5 text-amber-500 mr-2 flex-shrink-0" />
                 Características
               </h3>

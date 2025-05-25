@@ -1,8 +1,8 @@
 import type React from "react"
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
-import "./globals.css" // Moved the import here
-import { ThemeProvider } from "@/components/theme-provider"
+import { Providers } from "./providers"
+import "./globals.css"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -29,24 +29,14 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: {
+  children: React.ReactNode
+}) {
   return (
-    <html lang="es" suppressHydrationWarning>
-      {/* Add suppressHydrationWarning to the body tag */}
-      <body className={inter.className} suppressHydrationWarning>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="dark"
-          enableSystem
-          disableTransitionOnChange
-        >
-          {children}
-        </ThemeProvider>
+    <html lang="es">
+      <body>
+        <Providers>{children}</Providers>
       </body>
     </html>
-  );
+  )
 }
-
-// Removed the misplaced import from here

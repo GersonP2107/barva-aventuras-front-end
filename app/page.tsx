@@ -10,6 +10,7 @@ import GallerySection from "@/components/gallery-section"
 import CotizarSection from "@/components/cotizar-section"
 import Footer from "@/components/footer"
 import BlogSection from "@/components/blog-section"
+import ProductsSection from "@/components/products-section"
 
 
 export default function Home() {
@@ -53,6 +54,8 @@ export default function Home() {
       <ActivitiesSection />
       {/* Cotizar Tour Section */}
       <CotizarSection />
+      {/* Products Section */}
+      <ProductsSection />
       {/* Blog Section */}
       <BlogSection />
       <Footer />

@@ -5,8 +5,14 @@ import Image from "next/image"
 import Link from "next/link"
 import { ChevronRight, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import SimpleCarousel from "@/components/simple-carousel"
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel"
+
 
 // Definimos la interfaz para los posts del blog basada en la entidad del backend
 interface BlogPost {
@@ -107,34 +113,46 @@ export default function BlogSection() {
       </div>
 
       {recentPosts.length > 0 ? (
-        <SimpleCarousel itemsPerView={getBlogsPerView()} showArrows={true} showDots={true} className="mb-10">
-          {recentPosts.map((post) => (
-            <div key={post.id} className="bg-zinc-800 rounded-lg overflow-hidden group h-full w-[550px]">
-              <Link href={`/blog/${post.slug}`} className="block">
-                <div className="h-48 relative">
-                  <Image
-                    src={post.image || "/placeholder.svg"}
-                    alt={post.title}
-                    width={400}
-                    height={200}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                  />
-                </div>
-              </Link>
-              <div className="p-4">
-                <Link href={`/blog/${post.slug}`} className="block group">
-                  <h4 className="font-semibold mb-2 group-hover:text-amber-500 text-2xl transition-colors">{post.title}</h4>
-                </Link>
-                <p className="text-zinc-400 text-lg mb-4">{getExcerpt(post.content)}</p>
-                <Link href={`/blog/${post.slug}`}>
-                  <Button variant="link" className="text-amber-500 p-0 h-auto">
-                    Leer Más <ChevronRight className="w-4 h-4 ml-1" />
-                  </Button>
-                </Link>
-              </div>
+        <div className="w-full max-w-7xl mx-auto">
+          <Carousel className="mb-10">
+            <CarouselContent>
+              {recentPosts.map((post) => (
+                <CarouselItem key={post.id} className="md:basis-1/3 sm:basis-1/2 basis-full pl-4 md:pl-6">
+                  <div className="bg-zinc-800 rounded-lg overflow-hidden group h-full">
+                    <Link href={`/blog/${post.slug}`} className="block">
+                      <div className="h-48 relative">
+                        <Image
+                          src={post.image?.startsWith("/uploads")
+                            ? `http://localhost:3001${post.image}`
+                            : post.image || "/placeholder.svg"}
+                          alt={post.title}
+                          fill
+                          sizes="(max-width:640px) 90vw, (max-width:1024px) 45vw, 30vw"
+                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                        />
+                      </div>
+                    </Link>
+                    <div className="p-4">
+                      <Link href={`/blog/${post.slug}`} className="block group">
+                        <h4 className="font-semibold mb-2 group-hover:text-amber-500 text-2xl transition-colors">{post.title}</h4>
+                      </Link>
+                      <p className="text-zinc-400 text-lg mb-4">{getExcerpt(post.content)}</p>
+                      <Link href={`/blog/${post.slug}`}>
+                        <Button variant="link" className="text-amber-500 p-0 h-auto">
+                          Leer Más <ChevronRight className="w-4 h-4 ml-1" />
+                        </Button>
+                      </Link>
+                    </div>
+                  </div>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <div className="flex justify-end gap-2 mt-4">
+              <CarouselPrevious className="static transform-none bg-amber-500 hover:bg-amber-600 text-black border-none" />
+              <CarouselNext className="static transform-none bg-amber-500 hover:bg-amber-600 text-black border-none" />
             </div>
-          ))}
-        </SimpleCarousel>
+          </Carousel>
+        </div>
       ) : (
         <div className="text-center py-8">
           <p className="text-zinc-400">No hay artículos disponibles en este momento.</p>

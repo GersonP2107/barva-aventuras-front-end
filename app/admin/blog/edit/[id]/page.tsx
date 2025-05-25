@@ -1,15 +1,13 @@
 "use client"
 
-import { useState, useEffect, ChangeEvent, FormEvent } from "react"
-import { useRouter } from "next/navigation"
-import { ArrowLeft, Save, Loader2, ImagePlus, Trash2 } from "lucide-react"
-import { useParams } from "next/navigation"
-
+import { useState, useEffect, useCallback, ChangeEvent, FormEvent } from "react"
+import { useRouter, useParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { ArrowLeft, Loader2 } from "lucide-react"
 
 interface BlogFormData {
   title: string
@@ -17,9 +15,10 @@ interface BlogFormData {
   content: string
   author: string
   tags: string
-  imageUrl?: string
-  metaTitle?: string
-  metaDescription?: string
+  image: string
+  category: string
+  readTime: string
+  isActive: boolean
 }
 
 export default function EditBlogPostPage() {
@@ -33,170 +32,141 @@ export default function EditBlogPostPage() {
     content: "",
     author: "",
     tags: "",
-    imageUrl: "",
-    metaTitle: "",
-    metaDescription: "",
+    image: "",
+    category: "",
+    readTime: "",
+    isActive: true
   })
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
-  const [imagePreview, setImagePreview] = useState<string | null>(null)
+  const [currentImageUrl, setCurrentImageUrl] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  useEffect(() => {
-    const fetchBlogPost = async () => {
-      try {
-        const response = await fetch(`http://localhost:3001/blog/${id}`)
-        if (!response.ok) {
-          throw new Error("Failed to fetch blog post")
-        }
-        
-        const blogPost = await response.json()
-        
-        // Convert tags array to comma-separated string if needed
-        const tagsString = Array.isArray(blogPost.tags) 
-          ? blogPost.tags.join(", ") 
-          : blogPost.tags || ""
-        
-        setFormData({
-          title: blogPost.title || "",
-          slug: blogPost.slug || "",
-          content: blogPost.content || "",
-          author: blogPost.author || "",
-          tags: tagsString,
-          imageUrl: blogPost.imageUrl || "",
-          metaTitle: blogPost.metaTitle || "",
-          metaDescription: blogPost.metaDescription || "",
-        })
-        
-        // Set image preview if there's an imageUrl
-        if (blogPost.imageUrl) {
-          setImagePreview(blogPost.imageUrl)
-        }
-        
-      } catch (err) {
-        console.error("Error fetching blog post:", err)
-        setError("No se pudo cargar la entrada de blog. Por favor, inténtalo de nuevo.")
-      } finally {
-        setIsLoading(false)
+  const fetchBlogPost = useCallback(async () => {
+    try {
+      const response = await fetch(`http://localhost:3001/blog/${id}`)
+      if (!response.ok) {
+        throw new Error("Failed to fetch blog post")
       }
+      
+      const blogPost = await response.json()
+      const tagsString = Array.isArray(blogPost.tags) 
+        ? blogPost.tags.join(", ") 
+        : blogPost.tags || ""
+      
+      setFormData({
+        title: blogPost.title || "",
+        slug: blogPost.slug || "",
+        content: blogPost.content || "",
+        author: blogPost.author || "",
+        tags: tagsString,
+        image: blogPost.image || "",
+        category: blogPost.category || "",
+        readTime: blogPost.readTime || "",
+        isActive: blogPost.isActive !== false
+      })
+
+      // Set current image URL for preview
+      if (blogPost.image) {
+        setCurrentImageUrl(
+          blogPost.image.startsWith('/uploads') 
+            ? `http://localhost:3001${blogPost.image}` 
+            : blogPost.image
+        )
+      }
+    } catch (err) {
+      console.error("Error fetching blog post:", err)
+      setError("No se pudo cargar la entrada de blog. Por favor, inténtalo de nuevo.")
     }
-    
-    fetchBlogPost()
   }, [id])
+
+  useEffect(() => {
+    fetchBlogPost()
+  }, [fetchBlogPost])
 
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
     setFormData((prev) => ({ ...prev, [name]: value }))
+  }
 
-    if (name === "title" && !formData.slug) {
-      // Auto-generate slug from title (simple version)
-      const generatedSlug = value
-        .toLowerCase()
-        .trim()
-        .replace(/\s+/g, "-")
-        .replace(/[^\w-]+/g, "")
-        .replace(/--+/g, "-")
-      setFormData((prev) => ({ ...prev, slug: generatedSlug }))
-    }
+  const handleCheckboxChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const { name, checked } = e.target
+    setFormData((prev) => ({ ...prev, [name]: checked }))
   }
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0]
-      setSelectedFile(file)
-      
-      // Create a preview URL
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        setImagePreview(reader.result as string)
-      }
-      reader.readAsDataURL(file)
-      setError(null)
-    } else {
-      setSelectedFile(null)
-      // Don't reset imagePreview here to keep showing the existing image
-    }
+    setSelectedFile(e.target.files?.[0] || null)
   }
 
   const uploadImage = async (file: File): Promise<string> => {
     const formData = new FormData()
     formData.append("file", file)
-  
-    const res = await fetch("http://localhost:3001/blog/upload", {
-      method: "POST",
-      body: formData,
-    })
-  
-    if (!res.ok) {
-      throw new Error("Error uploading image")
+
+    try {
+      const res = await fetch("http://localhost:3001/blog/upload", {
+        method: "POST",
+        body: formData,
+      })
+
+      if (!res.ok) {
+        const errorData = await res
+          .json()
+          .catch(() => ({ message: "Unknown upload error" }))
+        throw new Error(errorData.message || "Error uploading image")
+      }
+
+      const data = await res.json();
+      return `/uploads/${data.filename}`;
+    } catch (uploadError) {
+      console.error("Image upload failed:", uploadError)
+      throw uploadError
     }
-  
-    const data = await res.json()
-    return `/uploads/${data.filename}`
   }
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
-    
-    // Basic validation
-    if (!formData.title.trim() || !formData.slug.trim() || !formData.content.trim() || !formData.author.trim()) {
-      setError("Por favor, completa todos los campos obligatorios: Título, Slug, Contenido y Autor.")
-      return
-    }
-
     setIsSubmitting(true)
     setError(null)
-
+  
     try {
-      // Step 1: Upload the image if a new one is selected
-      let imageUrl = formData.imageUrl || ""
-      if (selectedFile) {
-        try {
-          imageUrl = await uploadImage(selectedFile)
-          console.log("Image uploaded successfully:", imageUrl)
-        } catch (uploadErr) {
-          console.error("Image upload error:", uploadErr)
-          throw new Error("Error al subir la imagen: " + (uploadErr instanceof Error ? uploadErr.message : "Error desconocido"))
-        }
-      }
-
-      // Convert tags string to array if needed
+      // Convert tags string to array
       const tagsArray = formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag !== '')
+      
+      // Start with existing image URL, might be overwritten by upload
+      let imageUrl = formData.image;
 
-      // Step 2: Update the blog post with the image URL
+      // Upload new image if selected
+      if (selectedFile) {
+        imageUrl = await uploadImage(selectedFile)
+      }
+      
+      // Map frontend field names to match backend entity fields
       const blogPostData = {
         title: formData.title,
         slug: formData.slug,
         content: formData.content,
         author: formData.author,
-        tags: tagsArray, // Send as array
-        imageUrl: imageUrl,
-        metaTitle: formData.metaTitle || "",
-        metaDescription: formData.metaDescription || ""
+        tags: tagsArray,
+        image: imageUrl,
+        category: formData.category,
+        readTime: formData.readTime,
+        isActive: formData.isActive
       }
-
-      console.log("Sending update with data:", JSON.stringify(blogPostData))
-
-      // Make sure the URL matches exactly what your backend expects
+  
       const response = await fetch(`http://localhost:3001/blog/${id}`, {
-        method: "PATCH", // Changed from empty string to PATCH to match the controller
+        method: "PATCH",
         headers: { 
           "Content-Type": "application/json"
         },
         body: JSON.stringify(blogPostData)
-      })
-
-      // Handle response
+      });
+  
       if (!response.ok) {
-        console.error("Error status:", response.status);
         const errorText = await response.text();
-        console.error("Error response:", errorText);
-        throw new Error(`Error al actualizar: ${response.status}`);
+        throw new Error(`Error al actualizar: ${response.status} - ${errorText}`);
       }
-
-      console.log("Blog post updated successfully!")
-      router.push("/admin/blog") // Redirect to blog admin page on success
+  
+      router.push("/admin/blog")
     } catch (err) {
       console.error("Failed to update blog post:", err)
       setError(err instanceof Error ? err.message : "Ocurrió un error inesperado")
@@ -205,218 +175,219 @@ export default function EditBlogPostPage() {
     }
   }
 
-  const handleRemoveImage = () => {
-    setImagePreview(null)
-    setSelectedFile(null)
-    setFormData(prev => ({ ...prev, imageUrl: "" }))
-  }
-
-  if (isLoading) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <Loader2 className="w-8 h-8 animate-spin text-amber-500" />
-        <span className="ml-2 text-white">Cargando entrada de blog...</span>
-      </div>
-    )
-  }
-
   return (
-    <div className="max-w-3xl mx-auto p-4 md:p-0 text-white">
-      <div className="flex items-center justify-between mb-8">
+    <main className="max-w-4xl mx-auto p-4 md:p-0 text-white">
+      <header className="flex items-center justify-between mb-8">
         <h1 className="text-3xl font-bold">Editar Entrada de Blog</h1>
         <Button
           variant="outline"
           onClick={() => router.back()}
-          className="border-zinc-700 text-black hover:bg-zinc-400"
+          className="border-zinc-700 text-white hover:bg-zinc-700"
         >
           <ArrowLeft className="w-4 h-4 mr-2" /> Volver
         </Button>
-      </div>
+      </header>
+
+      {error && (
+        <div role="alert" aria-live="assertive" className="bg-red-500/20 text-red-200 p-4 rounded-lg mb-6">
+          {error}
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} className="space-y-8">
-        <Card className="bg-zinc-900 text-white border-zinc-800">
-          <CardHeader>
-            <CardTitle className="text-xl text-amber-500">Contenido Principal</CardTitle>
-            <CardDescription className="text-zinc-400">
-              Edita la información principal de tu entrada de blog.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div>
-              <Label htmlFor="title" className="block mb-2 text-sm font-medium">
-                Título <span className="text-red-500">*</span>
-              </Label>
-              <Input
-                id="title"
-                name="title"
-                value={formData.title}
-                onChange={handleChange}
-                required
-                placeholder="Ej: Las mejores rutas de senderismo en Barva"
-                className="bg-zinc-950 border-zinc-700 focus:border-amber-500 focus:ring-amber-500"
-              />
-            </div>
+        <section aria-labelledby="basic-info-title">
+          <Card className="bg-zinc-900 text-white border-zinc-800">
+            <CardHeader>
+              <CardTitle id="basic-info-title" className="text-xl text-amber-500">
+                Información Básica
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <fieldset>
+                  <Label htmlFor="title" className="block mb-2 text-sm font-medium">
+                    Título
+                  </Label>
+                  <Input
+                    id="title"
+                    name="title"
+                    value={formData.title}
+                    onChange={handleChange}
+                    required
+                    className="bg-zinc-950 border-zinc-700 focus:border-amber-500 focus:ring-amber-500"
+                  />
+                </fieldset>
+                <fieldset>
+                  <Label htmlFor="slug" className="block mb-2 text-sm font-medium">
+                    Slug
+                  </Label>
+                  <Input
+                    id="slug"
+                    name="slug"
+                    value={formData.slug}
+                    onChange={handleChange}
+                    required
+                    className="bg-zinc-950 border-zinc-700 focus:border-amber-500 focus:ring-amber-500"
+                  />
+                </fieldset>
+              </div>
 
-            <div>
-              <Label htmlFor="slug" className="block mb-2 text-sm font-medium">
-                Slug (URL amigable) <span className="text-red-500">*</span>
-              </Label>
-              <Input
-                id="slug"
-                name="slug"
-                value={formData.slug}
-                onChange={handleChange}
-                required
-                placeholder="Ej: mejores-rutas-senderismo-barva"
-                className="bg-zinc-950 border-zinc-700 focus:border-amber-500 focus:ring-amber-500"
-              />
-              <p className="text-xs text-zinc-500 mt-1">URL amigable para la entrada de blog.</p>
-            </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <fieldset>
+                  <Label htmlFor="author" className="block mb-2 text-sm font-medium">
+                    Autor
+                  </Label>
+                  <Input
+                    id="author"
+                    name="author"
+                    value={formData.author}
+                    onChange={handleChange}
+                    required
+                    className="bg-zinc-950 border-zinc-700 focus:border-amber-500 focus:ring-amber-500"
+                  />
+                </fieldset>
+                <fieldset>
+                  <Label htmlFor="category" className="block mb-2 text-sm font-medium">
+                    Categoría
+                  </Label>
+                  <Input
+                    id="category"
+                    name="category"
+                    value={formData.category}
+                    onChange={handleChange}
+                    className="bg-zinc-950 border-zinc-700 focus:border-amber-500 focus:ring-amber-500"
+                  />
+                </fieldset>
+              </div>
 
-            <div>
-              <Label htmlFor="imageFile" className="block mb-2 text-sm font-medium">
-                Imagen Principal
-              </Label>
-              <Input
-                id="imageFile"
-                type="file"
-                accept="image/*"
-                onChange={handleFileChange}
-                className="bg-zinc-950 h-auto border-zinc-700 focus:border-amber-500 focus:ring-amber-500 file:mr-4 file:py-3 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-amber-100 file:text-amber-700 hover:file:bg-amber-200 cursor-pointer"
-              />
-              {imagePreview && (
-                <div className="mt-4 relative">
-                  <p className="text-sm text-zinc-400 mb-2">Imagen actual:</p>
-                  <div className="relative inline-block">
-                    <img src={imagePreview} alt="Vista previa de imagen principal" className="max-w-xs max-h-48 rounded-md border border-zinc-700" />
-                    <Button 
-                      type="button"
-                      variant="destructive" 
-                      size="sm"
-                      onClick={handleRemoveImage}
-                      className="absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white p-1 rounded-full"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
-                  </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <fieldset>
+                  <Label htmlFor="tags" className="block mb-2 text-sm font-medium">
+                    Etiquetas (separadas por comas)
+                  </Label>
+                  <Input
+                    id="tags"
+                    name="tags"
+                    value={formData.tags}
+                    onChange={handleChange}
+                    placeholder="aventura, naturaleza, costa rica"
+                    className="bg-zinc-950 border-zinc-700 focus:border-amber-500 focus:ring-amber-500"
+                  />
+                </fieldset>
+                <fieldset>
+                  <Label htmlFor="readTime" className="block mb-2 text-sm font-medium">
+                    Tiempo de Lectura
+                  </Label>
+                  <Input
+                    id="readTime"
+                    name="readTime"
+                    value={formData.readTime}
+                    onChange={handleChange}
+                    placeholder="5 min"
+                    className="bg-zinc-950 border-zinc-700 focus:border-amber-500 focus:ring-amber-500"
+                  />
+                </fieldset>
+              </div>
+
+              <fieldset>
+                <div className="flex items-center space-x-2 mb-2">
+                  <input
+                    type="checkbox"
+                    id="isActive"
+                    name="isActive"
+                    checked={formData.isActive}
+                    onChange={handleCheckboxChange}
+                    className="rounded border-zinc-700 text-amber-500 focus:ring-amber-500"
+                  />
+                  <Label htmlFor="isActive" className="text-sm font-medium">
+                    Publicado (visible en el sitio)
+                  </Label>
                 </div>
-              )}
-              {selectedFile && (
-                <p className="text-sm mt-2 text-green-400">
-                  Nuevo archivo seleccionado: {selectedFile.name}
-                </p>
-              )}
-            </div>
+              </fieldset>
+            </CardContent>
+          </Card>
+        </section>
 
-            <div>
-              <Label htmlFor="content" className="block mb-2 text-sm font-medium">
-                Contenido <span className="text-red-500">*</span>
-              </Label>
-              <Textarea
-                id="content"
-                name="content"
-                value={formData.content}
-                onChange={handleChange}
-                required
-                placeholder="Escribe aquí el contenido de tu entrada de blog..."
-                className="bg-zinc-950 border-zinc-700 focus:border-amber-500 focus:ring-amber-500 min-h-[200px]"
-                rows={10}
-              />
-            </div>
+        <section aria-labelledby="image-section-title">
+          <Card className="bg-zinc-900 text-white border-zinc-800">
+            <CardHeader>
+              <CardTitle id="image-section-title" className="text-xl text-amber-500">
+                Imagen del Blog
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <fieldset>
+                  <Label htmlFor="imageFile" className="block mb-2 text-sm font-medium">
+                    Seleccionar Nueva Imagen
+                  </Label>
+                  <Input
+                    id="imageFile"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileChange}
+                    className="bg-zinc-950 h-24 border-zinc-700 focus:border-amber-500 focus:ring-amber-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-amber-100 file:text-amber-700 hover:file:bg-amber-200 cursor-pointer"
+                  />
+                  {selectedFile && (
+                    <p className="text-sm mt-1 text-green-400">
+                      Archivo seleccionado: {selectedFile.name}
+                    </p>
+                  )}
+                </fieldset>
+                <figure>
+                  {currentImageUrl && (
+                    <div className="flex flex-col justify-center items-center mb-2">
+                      <figcaption className="text-xs text-zinc-400 mb-1">Imagen actual:</figcaption>
+                      <img
+                        src={currentImageUrl.startsWith('/uploads') 
+                          ? `http://localhost:3001${currentImageUrl}` 
+                          : currentImageUrl}
+                        alt="Imagen actual del blog"
+                        className="mt-2 w-40 h-auto object-cover rounded border border-zinc-700"
+                      />
+                    </div>
+                  )}
+                  {!currentImageUrl && !selectedFile && (
+                    <div className="h-40 w-full flex items-center justify-center bg-zinc-800 rounded-md">
+                      <p className="text-zinc-500">No hay imagen</p>
+                    </div>
+                  )}
+                </figure>
+              </div>
+            </CardContent>
+          </Card>
+        </section>
 
-            <div>
-              <Label htmlFor="author" className="block mb-2 text-sm font-medium">
-                Autor <span className="text-red-500">*</span>
-              </Label>
-              <Input
-                id="author"
-                name="author"
-                value={formData.author}
-                onChange={handleChange}
-                required
-                placeholder="Ej: Juan Pérez"
-                className="bg-zinc-950 border-zinc-700 focus:border-amber-500 focus:ring-amber-500"
-              />
-            </div>
+        <section aria-labelledby="content-section-title">
+          <Card className="bg-zinc-900 text-white border-zinc-800">
+            <CardHeader>
+              <CardTitle id="content-section-title" className="text-xl text-amber-500">
+                Contenido
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <fieldset>
+                <Textarea
+                  id="content"
+                  name="content"
+                  value={formData.content}
+                  onChange={handleChange}
+                  required
+                  className="bg-zinc-950 border-zinc-700 focus:border-amber-500 focus:ring-amber-500 min-h-[300px]"
+                  rows={12}
+                  aria-label="Contenido del blog"
+                />
+              </fieldset>
+            </CardContent>
+          </Card>
+        </section>
 
-            <div>
-              <Label htmlFor="tags" className="block mb-2 text-sm font-medium">
-                Etiquetas (separadas por comas)
-              </Label>
-              <Input
-                id="tags"
-                name="tags"
-                value={formData.tags}
-                onChange={handleChange}
-                placeholder="Ej: senderismo, aventura, barva, naturaleza"
-                className="bg-zinc-950 border-zinc-700 focus:border-amber-500 focus:ring-amber-500"
-              />
-            </div>
-            
-            <div>
-              <Label htmlFor="imageUrl" className="block mb-2 text-sm font-medium">
-                URL de la Imagen Principal (Opcional)
-              </Label>
-              <Input
-                id="imageUrl"
-                name="imageUrl"
-                type="url"
-                value={formData.imageUrl}
-                onChange={handleChange}
-                placeholder="https://ejemplo.com/imagen.jpg"
-                className="bg-zinc-950 border-zinc-700 focus:border-amber-500 focus:ring-amber-500"
-              />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-zinc-900 text-white border-zinc-800">
-          <CardHeader>
-            <CardTitle className="text-xl text-amber-500">SEO (Opcional)</CardTitle>
-            <CardDescription className="text-zinc-400">
-              Optimiza tu entrada para motores de búsqueda.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div>
-              <Label htmlFor="metaTitle" className="block mb-2 text-sm font-medium">
-                Meta Título
-              </Label>
-              <Input
-                id="metaTitle"
-                name="metaTitle"
-                value={formData.metaTitle}
-                onChange={handleChange}
-                placeholder="Título para SEO, ej: Guía Completa de Senderismo en Barva"
-                className="bg-zinc-950 border-zinc-700 focus:border-amber-500 focus:ring-amber-500"
-              />
-            </div>
-            <div>
-              <Label htmlFor="metaDescription" className="block mb-2 text-sm font-medium">
-                Meta Descripción
-              </Label>
-              <Textarea
-                id="metaDescription"
-                name="metaDescription"
-                value={formData.metaDescription}
-                onChange={handleChange}
-                placeholder="Breve descripción para motores de búsqueda (aprox. 155-160 caracteres)."
-                className="bg-zinc-950 border-zinc-700 focus:border-amber-500 focus:ring-amber-500"
-                rows={3}
-              />
-            </div>
-          </CardContent>
-        </Card>
-
-        {error && <p className="text-red-500 mb-4 text-center">{error}</p>}
-
-        <div className="flex justify-end gap-4">
+        <footer className="flex justify-end space-x-4">
           <Button
             type="button"
             variant="outline"
             onClick={() => router.back()}
-            disabled={isSubmitting}
-            className="border-zinc-700 hover:bg-zinc-400 text-black"
+            className="border-zinc-700 text-white hover:bg-zinc-700"
           >
             Cancelar
           </Button>
@@ -430,13 +401,11 @@ export default function EditBlogPostPage() {
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" /> Guardando...
               </>
             ) : (
-              <>
-                <Save className="w-4 h-4 mr-2" /> Actualizar Entrada
-              </>
+              "Actualizar Entrada"
             )}
           </Button>
-        </div>
+        </footer>
       </form>
-    </div>
+    </main>
   )
 }

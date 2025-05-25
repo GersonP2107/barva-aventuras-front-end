@@ -38,12 +38,14 @@ export default function CotizarSection() {
     setSubmitStatus(null)
     
     try {
-      // Reemplaza estos valores con tus propias credenciales de EmailJS
-      const serviceId = 'service_8ckrglq'
-      const templateId = 'template_tmxvydm'
-      const publicKey = 'qPLrdTXqg0PZSTWiZ'
+      const serviceId = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID
+      const templateId = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID
+      const publicKey = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY 
       
-      // Usando sendForm en lugar de send
+      if (!serviceId || !templateId || !publicKey) {
+        throw new Error('EmailJS configuration is missing')
+      }
+      
       if (formRef.current) {
         const result = await emailjs.sendForm(
           serviceId,
@@ -58,7 +60,6 @@ export default function CotizarSection() {
           message: "¡Gracias! Tu solicitud ha sido enviada. Nos pondremos en contacto contigo pronto."
         })
         
-        // Resetear el formulario
         setFormData({
           nombre: "",
           email: "",
@@ -84,19 +85,18 @@ export default function CotizarSection() {
   return (
     <section id="cotizar" className="py-16 bg-zinc-800/30">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-12">
+        <header className="text-center mb-12">
           <h3 className="text-amber-500 font-medium mb-2 animate-fade-in">PERSONALIZA TU EXPERIENCIA</h3>
           <h2 className="text-4xl md:text-5xl font-bold mb-4">Cotiza Tu Tour</h2>
           <p className="text-zinc-400 max-w-3xl mx-auto">
             Diseña tu aventura perfecta en Costa Rica. Completa el formulario y nuestro equipo te enviará una cotización
             personalizada.
           </p>
-        </div>
+        </header>
 
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
-          <div className="lg:col-span-2 space-y-6">
-            {/* Contenido de la columna izquierda sin cambios */}
-            <div className="bg-zinc-800/50 p-6 rounded-lg">
+          <aside className="lg:col-span-2 space-y-6">
+            <article className="bg-zinc-800/50 p-6 rounded-lg">
               <h3 className="text-xl font-bold mb-4 flex items-center">
                 <span className="w-8 h-8 bg-amber-500 rounded-full flex items-center justify-center mr-3">
                   <span className="text-black font-bold">1</span>
@@ -106,11 +106,11 @@ export default function CotizarSection() {
               <ul className="space-y-3">
                 <li className="flex items-start">
                   <span className="text-amber-500 mr-2">•</span>
-                  <span className="text-zinc-300">Tours 100% personalizados según tus intereses</span>
+                  <span className="text-zinc-300">Tours según tus intereses</span>
                 </li>
                 <li className="flex items-start">
                   <span className="text-amber-500 mr-2">•</span>
-                  <span className="text-zinc-300">Guías locales expertos y certificados</span>
+                  <span className="text-zinc-300">Guías locales expertos</span>
                 </li>
                 <li className="flex items-start">
                   <span className="text-amber-500 mr-2">•</span>
@@ -121,39 +121,38 @@ export default function CotizarSection() {
                   <span className="text-zinc-300">Opciones para todos los presupuestos</span>
                 </li>
               </ul>
-            </div>
+            </article>
 
-            <div className="bg-zinc-800/50 p-6 rounded-lg">
+            <article className="bg-zinc-800/50 p-6 rounded-lg">
               <h3 className="text-xl font-bold mb-4 flex items-center">
                 <span className="w-8 h-8 bg-amber-500 rounded-full flex items-center justify-center mr-3">
                   <span className="text-black font-bold">2</span>
                 </span>
                 Información de contacto
               </h3>
-              <div className="space-y-3">
+              <address className="space-y-3 not-italic">
                 <p className="flex items-center text-zinc-300">
                   <MapPin className="w-5 h-5 text-amber-500 mr-3" />
                   San José, Costa Rica
                 </p>
                 <p className="flex items-center text-zinc-300">
                   <Phone className="w-5 h-5 text-amber-500 mr-3" />
-                  +506 2222-3333
+                  +506 8342 8167 
                 </p>
                 <p className="flex items-center text-zinc-300">
                   <Mail className="w-5 h-5 text-amber-500 mr-3" />
-                  info@caminocostarica.com
+                  barvaaventuras@gmail.com
                 </p>
                 <p className="flex items-center text-zinc-300">
                   <Clock className="w-5 h-5 text-amber-500 mr-3" />
-                  Lun-Vie: 8:00 - 17:00
+                  Abierto 24 horas
                 </p>
-              </div>
-            </div>
-          </div>
+              </address>
+            </article>
+          </aside>
 
-          <div className="lg:col-span-3">
+          <main className="lg:col-span-3">
             <form ref={formRef} onSubmit={handleSubmit} className="bg-zinc-800/50 p-6 rounded-lg">
-              {/* Mensaje de estado del envío */}
               {submitStatus && (
                 <div className={`mb-6 p-4 rounded-lg ${submitStatus.success ? 'bg-green-500/20 text-green-200' : 'bg-red-500/20 text-red-200'}`}>
                   {submitStatus.message}
@@ -191,7 +190,6 @@ export default function CotizarSection() {
                 </div>
               </div>
 
-              {/* Resto de los campos del formulario con nombres actualizados */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 <div>
                   <label htmlFor="telefono" className="block text-sm font-medium text-zinc-300 mb-1">
@@ -237,7 +235,6 @@ export default function CotizarSection() {
                       onChange={(e) => setFormData({...formData, fechaViaje: e.target.value})}
                       className="w-full bg-zinc-700 border border-zinc-600 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-amber-500"
                     />
-                    <Calendar className="absolute right-3 top-1/2 transform -translate-y-1/2 text-zinc-400 pointer-events-none w-5 h-5" />
                   </div>
                 </div>
                 <div>
@@ -289,7 +286,6 @@ export default function CotizarSection() {
                 ></textarea>
               </div>
 
-              {/* Campo oculto para el destinatario */}
               <input type="hidden" name="to_name" value="Barva Aventuras" />
 
               <Button
@@ -308,7 +304,7 @@ export default function CotizarSection() {
                 )}
               </Button>
             </form>
-          </div>
+          </main>
         </div>
       </div>
     </section>

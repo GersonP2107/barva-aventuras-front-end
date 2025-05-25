@@ -51,18 +51,18 @@ export default function Navbar() {
             </div>
             <div className="flex items-center text-zinc-200 text-sm">
               <Mail className="w-4 h-4 mr-2 text-amber-500" />
-              <span>barvaventuras@gmail.com</span>
+              <span>barvaaventuras@gmail.com</span>
             </div>
           </div>
 
           <div className="flex items-center space-x-4">
-            <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="text-zinc-200 hover:text-amber-500 transition-colors">
+            <a href="https://www.facebook.com/profile.php?id=100063744872622&rdid=9pjmwOzNdDE5ahy7&share_url=https%3A%2F%2Fwww.facebook.com%2Fshare%2F1Dc7BiGews%2F#" target="_blank" rel="noopener noreferrer" className="text-zinc-200 hover:text-amber-500 transition-colors">
               <Facebook className="w-5 h-5" />
             </a>
-            <a href="https://wa.me/50683428167" target="_blank" rel="noopener noreferrer" className="text-zinc-200 hover:text-amber-500 transition-colors">
+            <a href="https://wa.me/50683428167 " target="_blank" rel="noopener noreferrer" className="text-zinc-200 hover:text-amber-500 transition-colors">
               <MessageCircle className="w-5 h-5" />
             </a>
-            <a href="mailto:barvaventuras@gmail.com" className="text-zinc-200 hover:text-amber-500 transition-colors">
+            <a href="mailto:barvaaventuras@gmail.com" className="text-zinc-200 hover:text-amber-500 transition-colors">
               <Mail className="w-5 h-5" />
             </a>
           </div>

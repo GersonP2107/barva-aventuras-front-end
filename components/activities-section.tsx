@@ -1,11 +1,16 @@
 "use client"
 
-import { useState, useEffect } from "react" // Import useEffect
+import { useState, useEffect, useCallback } from "react" // Added useCallback
 import Image from "next/image"
-import type { Activity } from "@/types/activity"; // Assuming type is defined here or adjust path
+import type { Activity } from "@/types/activity"
 import ActivityModal from "@/components/activity-modal"
-import SimpleCarousel from "@/components/simple-carousel"
-import { Skeleton } from "@/components/ui/skeleton" // Import Skeleton for loading state
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel"
 
 export default function ActivitiesSection() {
   const [activities, setActivities] = useState<Activity[]>([])
@@ -13,13 +18,40 @@ export default function ActivitiesSection() {
   const [error, setError] = useState<string | null>(null)
   const [selectedActivityId, setSelectedActivityId] = useState<string | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [itemsPerView, setItemsPerView] = useState(1) // Default to 1 for mobile first approach
+
+  // Function to update items per view based on screen size
+  const updateItemsPerView = useCallback(() => {
+    if (typeof window !== 'undefined') {
+      if (window.innerWidth < 640) {
+        setItemsPerView(1) // Mobile: 1 item
+      } else if (window.innerWidth < 1024) {
+        setItemsPerView(3) // Tablet: 3 items
+      } else {
+        setItemsPerView(6) // Desktop: 6 items
+      }
+    }
+  }, [])
+
+  useEffect(() => {
+    // Initial setup
+    updateItemsPerView()
+
+    // Add resize listener
+    window.addEventListener('resize', updateItemsPerView)
+    
+    // Cleanup
+    return () => {
+      window.removeEventListener('resize', updateItemsPerView)
+    }
+  }, [updateItemsPerView])
 
   useEffect(() => {
     const fetchActivities = async () => {
       setLoading(true)
       setError(null)
       try {
-        const response = await fetch("http://localhost:3001/activities", { cache: 'no-store' }); // Fetch from backend
+        const response = await fetch("http://localhost:3001/activities", { cache: 'no-store' })
         if (!response.ok) {
           throw new Error(`Failed to fetch activities. Status: ${response.status}`)
         }
@@ -45,13 +77,10 @@ export default function ActivitiesSection() {
     setIsModalOpen(false)
   }
 
-  const [itemsPerView, setItemsPerView] = useState(6);
-
-
   if (loading) {
+    // Loading state remains the same
     return (
       <section id="actividades" className="container mx-auto px-4 py-16">
-        {/* Keep headers */}
         <div className="mb-6">
           <h3 className="text-amber-500 font-medium mb-2">ACTIVIDADES DE TOUR</h3>
           <h2 className="text-4xl md:text-5xl font-bold mb-4">Lo Mejor en Actividades</h2>
@@ -60,24 +89,21 @@ export default function ActivitiesSection() {
           </p>
         </div>
       </section>
-    );
+    )
   }
 
-  // --- Render Error State ---
   if (error) {
+    // Error state remains the same
     return (
       <section id="actividades" className="container mx-auto px-4 py-16 text-center">
         <h2 className="text-3xl font-bold text-red-500 mb-4">Error al cargar actividades</h2>
         <p className="text-zinc-400">{error}</p>
-        {/* Optionally add a retry button */}
       </section>
-    );
+    )
   }
 
-  // --- Render Activities ---
   return (
     <section id="actividades" className="container mx-auto px-4 py-16">
-      {/* Keep headers */}
       <div className="mb-6">
         <h3 className="text-amber-500 font-medium mb-2 animate-fade-in">ACTIVIDADES DE TOUR</h3>
         <h2 className="text-4xl md:text-5xl font-bold mb-4">Lo Mejor en Actividades</h2>
@@ -87,37 +113,46 @@ export default function ActivitiesSection() {
         </p>
       </div>
 
-      {/* Use fetched activities */}
-      <SimpleCarousel itemsPerView={itemsPerView} showArrows={true} showDots={true} className="mb-10">
-        {activities.map((activity) => (
-          <div key={activity.id} className="flex flex-col items-center">
-            <button
-              onClick={() => openModal(activity.id)} // Pass activity.id
-              className="group relative w-full aspect-square rounded-full overflow-hidden cursor-pointer transform transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-amber-500/20"
-            >
-              <div className="absolute inset-0 bg-black/30 group-hover:bg-black/20 transition-colors z-10"></div>
-              <Image
-                src={activity.image?.startsWith("/uploads")
-                  ? `http://localhost:3001${activity.image}`
-                  : activity.image || "/placeholder.svg"}
-                alt={activity.name}
-                fill
-                // Ensure sizes attribute matches expected rendering based on itemsPerView
-                sizes={`(max-width: 640px) ${100/2}vw, (max-width: 1024px) ${100/3}vw, ${100/6}vw`} // Example sizes, adjust as needed
-                className="object-cover" // Removed rounded-t-xl as parent is rounded-full
-              />
-              <div className="absolute inset-0 flex items-center justify-center z-20">
-                <span className="text-white text-center text-lg font-semibold truncate w-full px-2">{activity.name}</span> {/* Added padding and centering */}
-              </div>
-              <div className="absolute inset-0 flex items-center justify-center z-30 opacity-0 group-hover:opacity-100 transition-opacity">
-                <span className="bg-amber-500 text-black px-3 py-1 rounded-full text-sm font-medium">Ver Detalles</span>
-              </div>
-            </button>
+      {/* Replaced SimpleCarousel with shadcn Carousel */}
+      <div className="w-full max-w-5xl mx-auto">
+        <Carousel className="mb-10">
+          <CarouselContent className="justify-center -ml-2 md:-ml-4">
+            {activities.map((activity) => (
+              <CarouselItem key={activity.id} className="pl-2 md:pl-4 md:basis-1/3 lg:basis-1/3 sm:basis-1/3 basis-full m-2">
+                <div className="flex flex-col items-center justify-center px-2 w-full h-full">
+                  <div className="w-full flex items-center justify-center">
+                    <button
+                      onClick={() => openModal(activity.id)}
+                      className="group relative w-full max-w-[280px] aspect-square rounded-full overflow-hidden cursor-pointer transform transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-amber-500/20 mx-auto"
+                    >
+                      <div className="absolute inset-0 bg-black/30 group-hover:bg-black/20 transition-colors z-10"></div>
+                      <Image
+                        src={activity.image?.startsWith("/uploads")
+                          ? `http://localhost:3001${activity.image}`
+                          : activity.image || "/placeholder.svg"}
+                        alt={activity.name}
+                        fill
+                        sizes="(max-width: 640px) 80vw, (max-width: 1024px) 30vw, 16vw"
+                        className="object-cover"
+                      />
+                      <div className="absolute inset-0 flex items-center justify-center z-20">
+                        <span className="text-white text-center text-base sm:text-lg font-semibold truncate w-full px-4">{activity.name}</span>
+                      </div>
+                      <div className="absolute inset-0 flex items-center justify-center z-30 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <span className="bg-amber-500 text-black px-3 py-1 rounded-full text-xs sm:text-sm font-medium">Ver Detalles</span>
+                      </div>
+                    </button>
+                  </div>
+                </div>
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+          <div className="flex justify-end gap-2 mt-4">
+            <CarouselPrevious className="static transform-none bg-amber-500 hover:bg-amber-600 text-black border-none" />
+            <CarouselNext className="static transform-none bg-amber-500 hover:bg-amber-600 text-black border-none" />
           </div>
-        ))}
-      </SimpleCarousel>
-
-      {/* Pass activityId to the modal */}
+        </Carousel>
+      </div>
       <ActivityModal activityId={selectedActivityId} isOpen={isModalOpen} onClose={closeModal} />
     </section>
   )

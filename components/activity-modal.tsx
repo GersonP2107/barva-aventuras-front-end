@@ -130,7 +130,7 @@ export default function ActivityModal({ activityId, isOpen, onClose: handleClose
            {/* Use activityData */}
           <h2 className="text-4xl font-bold text-amber-500 mb-5">{activity.name}</h2>
            {/* Use activityData */}
-          <p className="text-zinc-300 text-2xl mb-5">{activity.description}</p>
+          <p className="text-zinc-300 text-xl mb-5">{activity.description}</p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
             <div className="flex items-center text-xl text-zinc-300">
               <Clock className="w-5 h-5 text-amber-500 mr-2" />
