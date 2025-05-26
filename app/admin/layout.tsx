@@ -44,6 +44,7 @@ export default function AdminLayout({
     )
   }
 
+  // Update the navItems array to include hero banners
   const navItems = [
     { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
     { name: "Activities", href: "/admin/activities", icon: Compass },
@@ -52,6 +53,7 @@ export default function AdminLayout({
     { name: "Gallery", href: "/admin/gallery", icon: Image },
     { name: "Products", href: "/admin/products", icon: Package },
     { name: "Camino Costa Rica", href: "/admin/camino-costa-rica", icon: Mountain },
+    { name: "Hero Banners", href: "/admin/hero-banners", icon: Image },
   ]
 
   const handleSignOut = async () => {

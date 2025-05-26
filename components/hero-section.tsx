@@ -5,26 +5,43 @@ import Image from "next/image"
 import { ChevronDown, Camera } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
+interface HeroBanner {
+  id: string
+  url: string
+  title: string
+  subtitle: string
+  isActive: boolean
+  order: number
+}
+
 export default function HeroSection() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
+  const [heroImages, setHeroImages] = useState<HeroBanner[]>([
+    // Default images as fallback
+   
+  ])
+  const [isLoading, setIsLoading] = useState(true)
 
-  const heroImages = [
-    {
-      url: "/hero-playa.webp",
-      title: "El Camino de Costa Rica",
-      subtitle: "De Mar a Mar - 280 km de aventura",
-    },
-    {
-      url: "/hero-capilla.webp",
-      title: "La Capilla en las Nubes",
-      subtitle: "Un Santuario Elevado en el Corazón de Costa Rica",
-    },
-    {
-      url: "/hero-volcan.webp",
-      title: "El Parque Nacional Volcán Poás",
-      subtitle: "Descubre la Majestuosidad del Cráter Activo",
-    },
-  ]
+  // Fetch hero banners from backend
+  useEffect(() => {
+    const fetchHeroBanners = async () => {
+      try {
+        const response = await fetch('http://localhost:3001/hero-banner')
+        if (response.ok) {
+          const data = await response.json()
+          if (data && data.length > 0) {
+            setHeroImages(data)
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching hero banners:', error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchHeroBanners()
+  }, [])
 
   useEffect(() => {
     const rotateImages = () => {
@@ -36,7 +53,7 @@ export default function HeroSection() {
     return () => {
       clearInterval(interval)
     }
-  }, [])
+  }, [heroImages.length])
 
   return (
     <section className="relative h-screen pt-[120px]">
@@ -44,22 +61,23 @@ export default function HeroSection() {
         {/* Background Image Carousel */}
         <div className="absolute inset-0 transition-opacity duration-1000">
           {heroImages.map((image, index) => ( 
-            <div
-              key={index}
+            <article
+              key={image.id}
               className={`absolute inset-0 transition-opacity duration-1000 ${
                 currentImageIndex === index ? "opacity-100" : "opacity-0"
               }`}
             >
-             
               <Image
-                src={image.url || "/placeholder.svg"}
+                src={image.url.startsWith('/uploads') 
+                  ? `http://localhost:3001${image.url}` 
+                  : image.url || "/placeholder.svg"}
                 alt={image.title}
                 fill
                 className="object-cover"
                 priority={index === 0}
               />
               <span className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/40 to-black/70"></span>
-            </div>
+            </article>
           ))}
         </div>
 
@@ -71,10 +89,10 @@ export default function HeroSection() {
                 Bienvenidos al paraíso
               </h2>
               <h1 className="text-5xl md:text-7xl font-bold mb-6 transition-all duration-700">
-                {heroImages[currentImageIndex].title}
+                {heroImages[currentImageIndex]?.title}
               </h1>
               <p className="text-xl md:text-2xl text-gray-200 transition-all duration-700">
-                {heroImages[currentImageIndex].subtitle}
+                {heroImages[currentImageIndex]?.subtitle}
               </p>
             </div>
 
