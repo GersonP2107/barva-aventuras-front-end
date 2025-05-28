@@ -228,7 +228,7 @@ export default function ProductForm({ productId }: ProductFormProps) {
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="flex justify-between items-center">
         <Button 
-          className="text-black"
+          className="border-zinc-700 text-black hover:bg-zinc-400"
           type="button" 
           variant="outline" 
           onClick={() => router.push("/admin/products")}
@@ -262,7 +262,7 @@ export default function ProductForm({ productId }: ProductFormProps) {
               value={formData.name}
               onChange={handleInputChange}
               required
-              className="text-black"
+              className=" bg-zinc-900 border-zinc-800"
             />
           </div>
           
@@ -277,7 +277,7 @@ export default function ProductForm({ productId }: ProductFormProps) {
               value={formData.price}
               onChange={handleInputChange}
               required
-              className="text-black"
+              className="bg-zinc-900 border-zinc-800"
             />
           </div>
           
@@ -287,8 +287,9 @@ export default function ProductForm({ productId }: ProductFormProps) {
               value={formData.rating.toString()} 
               onValueChange={(value) => handleSelectChange("rating", value)}
               
+              
             >
-              <SelectTrigger className="text-black">
+              <SelectTrigger className="bg-zinc-900 border-zinc-800">
                 <SelectValue  placeholder="Seleccionar calificación" />
               </SelectTrigger>
               <SelectContent className="-slate-500">
@@ -340,7 +341,7 @@ export default function ProductForm({ productId }: ProductFormProps) {
                     <p className="text-sm text-zinc-500">Haz clic para subir una imagen</p>
                   </div>
                 )}
-                <Button type="button" variant="outline" className="mt-4 text-black">
+                <Button type="button" variant="outline" className="mt-4 border-zinc-700 text-black hover:bg-zinc-400">
                   {imagePreview ? "Cambiar imagen" : "Seleccionar imagen"}
                 </Button>
               </label>

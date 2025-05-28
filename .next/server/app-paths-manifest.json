@@ -1,8 +1,8 @@
 {
-  "/api/auth/[...nextauth]/route": "app/api/auth/[...nextauth]/route.js",
-  "/page": "app/page.js",
-  "/admin/login/page": "app/admin/login/page.js",
+  "/admin/products/new/page": "app/admin/products/new/page.js",
   "/admin/hero-banners/page": "app/admin/hero-banners/page.js",
-  "/admin/hero-banners/new/page": "app/admin/hero-banners/new/page.js",
-  "/admin/hero-banners/edit/[id]/page": "app/admin/hero-banners/edit/[id]/page.js"
+  "/admin/page": "app/admin/page.js",
+  "/admin/camino-costa-rica/page": "app/admin/camino-costa-rica/page.js",
+  "/admin/products/page": "app/admin/products/page.js",
+  "/admin/hero-banners/new/page": "app/admin/hero-banners/new/page.js"
 }
