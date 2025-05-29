@@ -117,9 +117,9 @@ export default function HeroSection() {
               </Button>
             </div>
           </div>
-
-          {/* Image Indicators */}
-          <div className="absolute bottom-32 left-1/2 transform -translate-x-1/2 flex space-x-2">
+          
+          {/* Image Indicators - Moved outside the text content div for better positioning */}
+          <div className="absolute bottom-32 left-0 right-0 flex justify-center space-x-2">
             {heroImages.map((_, index) => (
               <button
                 key={index}
@@ -127,12 +127,13 @@ export default function HeroSection() {
                   currentImageIndex === index ? "bg-amber-500 w-8" : "bg-white/50 hover:bg-white/80"
                 }`}
                 onClick={() => setCurrentImageIndex(index)}
+                aria-label={`Ver imagen ${index + 1}`}
               />
             ))}
           </div>
-
-          {/* Scroll Indicator */}
-          <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
+          
+          {/* Scroll Indicator - Properly centered */}
+          <div className="absolute bottom-8 left-0 right-0 flex justify-center animate-bounce">
             <ChevronDown className="w-8 h-8 text-amber-400" />
           </div>
         </div>
