@@ -1,7 +1,0 @@
-{
-  "/page": "app/page.js",
-  "/admin/hero-banners/page": "app/admin/hero-banners/page.js",
-  "/admin/hero-banners/new/page": "app/admin/hero-banners/new/page.js",
-  "/admin/products/page": "app/admin/products/page.js",
-  "/admin/products/edit/[id]/page": "app/admin/products/edit/[id]/page.js"
-}
